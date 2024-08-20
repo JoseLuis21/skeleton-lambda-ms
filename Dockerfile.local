@@ -1,0 +1,11 @@
+# BUILDING STAGE #
+FROM public.ecr.aws/docker/library/golang:alpine AS builder
+WORKDIR /app
+COPY . .
+RUN go mod tidy
+RUN cd cmd/ms-lambda && go build -o /ms-lambda
+
+# RUNNER WITH LAMBDA IMAGE #
+FROM public.ecr.aws/lambda/provided:al2 AS runner
+COPY --from=builder /ms-lambda .
+ENTRYPOINT ["./ms-lambda"]

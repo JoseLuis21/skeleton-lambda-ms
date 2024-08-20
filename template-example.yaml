@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  test lambda local
+
+  Test Lambda in Local
+
+Globals:
+  Function:
+    Timeout: 15 # Seconds
+    MemorySize: 128 # MB
+
+Parameters:
+  #DATABASE
+  TEST_ENV:
+    Type: String
+
+Resources:
+  TestGolangLocalSqs:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      Architectures:
+        - arm64 # if arm = arm64 or intel = x86_64
+      Events:
+        SQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt MyQueue.Arn
+      Environment:
+        Variables:
+          #DATABASE
+          TEST_ENV: !Ref TESTENV
+    Metadata:
+      DockerContext: .
+      Dockerfile: Dockerfile.local
+
+  MyQueue:
+    Type: AWS::SQS::Queue
