@@ -6,6 +6,8 @@ import (
 	"log/slog"
 	"os"
 
+	adapters_product "github.com/JoseLuis21/skeleton-lambda-ms/internal/core/product/adapters"
+	service_product "github.com/JoseLuis21/skeleton-lambda-ms/internal/core/product/service"
 	"github.com/aws/aws-lambda-go/events"
 )
 
@@ -39,6 +41,12 @@ func (lambdaHandler *Handler) HandlerRequest(ctx context.Context, sqsEvent event
 		switch message.Path {
 		case PATH:
 			if message.Body != "" {
+				// Init Adapter
+				productRepo := adapters_product.NewProductRepository("mysql")
+				productService := service_product.NewProductService(productRepo)
+
+				// Using the service
+				productService.Find("123")
 				logger.Info("Test ID", "", message.Body)
 			} else {
 				batchItemFailures = append(batchItemFailures, map[string]interface{}{"itemIdentifier": record.MessageId})
